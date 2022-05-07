@@ -15,10 +15,6 @@ include_directories(.)
 # include_directories(/include)
 link_directories(/lib)
 
-# find_library命令用于查找库（动态库或者静态库），当构建依赖于第三方库/系统库，可以使用该命令来查找并使用库
-# set(YAMLCPP ${PROJECT_SOURCE_DIR}/lib/libsylar.dylib)
-# message("**--*", ${YAMLCPP})
-
 set(LIB_SRC
     sylar/log.cc
     sylar/util.cc
