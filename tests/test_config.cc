@@ -50,7 +50,7 @@ void test_config() {
 }
 
 int main(int argc, char** argv) {
-    test_yaml();
-    // test_config();
+    // test_yaml();
+    test_config();
     return 0;
 }

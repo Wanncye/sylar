@@ -2,28 +2,31 @@ cmake_minimum_required(VERSION 2.8)
 project(sylar)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
-set(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS}  -O0 -ggdb -std=c++11 -Wall -Wno-deprecated -Werror -Wno-unused-function")
-
-include_directories(.)
+set(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS} -O0 -ggdb -std=c++11 -Wall -Wno-deprecated -Werror -Wno-unused-function")
 # yaml安装之后的include路径
 include_directories(/usr/local/include) 
+include_directories(.)
+link_directories(/usr/local/lib)
 
-link_directories(/lib)
 find_library(YAMLCPP yaml-cpp)
-message("yaml-cpp.lib path LOG:" ${YAMLCPP})
+message("[My tag -*-*-*-*]:" ${YAMLCPP})
 
 set(LIB_SRC
     sylar/log.cc
     sylar/util.cc
+    sylar/config.cc
 )
+message("[My tag -*-*-*-*]:" ${LIB_SRC})
 
 add_library(sylar SHARED ${LIB_SRC})
-add_library(sylar_static STATIC ${LIB_SRC})
-SET_TARGET_PROPERTIES (sylar_static PROPERTIES OUTPUT_NAME "sylar")
+# add_library(sylar_static STATIC ${LIB_SRC})
+# SET_TARGET_PROPERTIES (sylar_static PROPERTIES OUTPUT_NAME "sylar")
+
+target_link_libraries(sylar ${YAMLCPP})
 
 add_executable(test tests/test.cc)
 add_dependencies(test sylar)
-target_link_libraries(test sylar)
+target_link_libraries(test sylar ${YAMLCPP})
 
 add_executable(test_config tests/test_config.cc)
 add_dependencies(test_config sylar)

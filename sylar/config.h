@@ -6,7 +6,7 @@
 #include <sstream>
 #include <yaml-cpp/yaml.h>
 #include <boost/lexical_cast.hpp>
-#include "sylar/log.h"
+#include "log.h"
 
 namespace sylar {
 
@@ -16,6 +16,7 @@ public:
     ConfigVarBase(const std::string& name, const std::string& description = "")
         :m_name(name)
         ,m_description(description) {
+        //在toupper/tolower前面加::，强制指定是C版本的
         std::transform(m_name.begin(), m_name.end(), m_name.begin(), ::tolower);
     }
     virtual ~ConfigVarBase() {}
