@@ -13,11 +13,13 @@ find_library(PTHREAD pthread)
 message("[My tag -*-*-*-*]:" ${YAMLCPP})
 
 set(LIB_SRC
-    sylar/log.cc
-    sylar/util.cc
     sylar/config.cc
+    sylar/fiber.cc
+    sylar/log.cc
+    sylar/scheduler.cc
     sylar/thread.cc
-)
+    sylar/util.cc
+    )
 
 set(LIBS
     sylar
@@ -46,6 +48,18 @@ target_link_libraries(test_config ${LIBS})
 add_executable(test_thread tests/test_thread.cc)
 add_dependencies(test_thread sylar)
 target_link_libraries(test_thread ${LIBS})
+
+add_executable(test_util tests/test_util.cc)
+add_dependencies(test_util sylar)
+target_link_libraries(test_util ${LIBS})
+
+add_executable(test_fiber tests/test_fiber.cc)
+add_dependencies(test_fiber sylar)
+target_link_libraries(test_fiber ${LIBS})
+
+add_executable(test_scheduler tests/test_scheduler.cc)
+add_dependencies(test_scheduler sylar)
+target_link_libraries(test_scheduler ${LIBS})
 
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)

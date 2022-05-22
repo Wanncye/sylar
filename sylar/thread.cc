@@ -1,7 +1,6 @@
 #include "thread.h"
 #include "log.h"
 #include "util.h"
-#include <iostream>
 
 namespace sylar {
 
@@ -12,7 +11,6 @@ static sylar::Logger::ptr g_logger = SYLAR_LOG_NAME("system");
 
 
 Semaphore::Semaphore(uint32_t count) {
-    // std::cout << count << std::endl;
     if(sem_init(&m_semaphore, 0, count)) {
         throw std::logic_error("sem_init error");
     }
@@ -87,8 +85,8 @@ void* Thread::run(void* arg) {
     t_thread = thread;
     t_thread_name = thread->m_name;
     thread->m_id = sylar::GetThreadId();
-    pthread_setname_np(thread->m_name.substr(0, 15).c_str());
     // pthread_setname_np(pthread_self(), thread->m_name.substr(0, 15).c_str());
+    pthread_setname_np(thread->m_name.substr(0, 15).c_str());
 
     std::function<void()> cb;
     cb.swap(thread->m_cb);

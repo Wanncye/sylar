@@ -197,7 +197,6 @@ public:
 // public:
 //     typedef ScopedLockImpl<Spinlock> Lock;
 //     Spinlock() {
-        
 //         pthread_spin_init(&m_mutex, 0);
 //     }
 
