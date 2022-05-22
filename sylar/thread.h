@@ -15,7 +15,7 @@ namespace sylar {
 
 class Semaphore {
 public:
-    Semaphore(uint32_t count = 0);
+    Semaphore(uint32_t count = 1);
     ~Semaphore();
 
     void wait();
@@ -261,7 +261,7 @@ private:
     std::function<void()> m_cb;
     std::string m_name;
 
-    // Semaphore m_semaphore;
+    Semaphore m_semaphore;
 };
 
 }
