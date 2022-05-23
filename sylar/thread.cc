@@ -1,6 +1,7 @@
 #include "thread.h"
 #include "log.h"
 #include "util.h"
+#include<iostream>
 
 namespace sylar {
 
@@ -11,23 +12,30 @@ static sylar::Logger::ptr g_logger = SYLAR_LOG_NAME("system");
 
 
 Semaphore::Semaphore(uint32_t count) {
-    if(sem_init(&m_semaphore, 0, count)) {
-        throw std::logic_error("sem_init error");
+    // linux
+    // if(sem_init(&m_semaphore, 0, count)) {
+    //     throw std::logic_error("sem_init error");
+    // } 
+
+    //macOS
+    m_semaphore = sem_open("sem_init_name_wcy", O_CREAT, 0644, 0);
+    if(!m_semaphore) {
+        throw std::logic_error("sem_init_wcy error");
     }
 }
 
 Semaphore::~Semaphore() {
-    sem_destroy(&m_semaphore);
+    sem_destroy(m_semaphore);
 }
 
 void Semaphore::wait() {
-    if(sem_wait(&m_semaphore)) {
+    if(sem_wait(m_semaphore)) {
         throw std::logic_error("sem_wait error");
     }
 }
 
 void Semaphore::notify() {
-    if(sem_post(&m_semaphore)) {
+    if(sem_post(m_semaphore)) {
         throw std::logic_error("sem_post error");
     }
 }

@@ -25,7 +25,7 @@ private:
     Semaphore(const Semaphore&&) = delete;
     Semaphore& operator=(const Semaphore&) = delete;
 private:
-    sem_t m_semaphore;
+    sem_t* m_semaphore;
 };
 
 template<class T>
