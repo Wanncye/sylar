@@ -1,58 +1,70 @@
-#ifndef __FD_MANAGER_H__
-#define __FD_MANAGER_H__
+#ifndef __SYLAR_IOMANAGER_H__
+#define __SYLAR_IOMANAGER_H__
 
-#include <memory>
-#include <vector>
-#include "thread.h"
-#include "singleton.h"
+#include "scheduler.h"
+#include "timer.h"
 
 namespace sylar {
 
-class FdCtx : public std::enable_shared_from_this<FdCtx> {
+class IOManager : public Scheduler, public TimerManager {
 public:
-    typedef std::shared_ptr<FdCtx> ptr;
-    FdCtx(int fd);
-    ~FdCtx();
-
-    bool init();
-    bool isInit() const { return m_isInit;}
-    bool isSocket() const { return m_isSocket;}
-    bool isClose() const { return m_isClosed;}
-    bool close();
-
-    void setUserNonblock(bool v) { m_userNonblock = v;}
-    bool getUserNonblock() const { return m_userNonblock;}
-
-    void setSysNonblock(bool v) { m_sysNonblock = v;}
-    bool getSysNonblock() const { return m_sysNonblock;}
-
-    void setTimeout(int type, uint64_t v);
-    uint64_t getTimeout(int type);
-private:
-    bool m_isInit: 1;
-    bool m_isSocket: 1;
-    bool m_sysNonblock: 1;
-    bool m_userNonblock: 1;
-    bool m_isClosed: 1;
-    int m_fd;
-    uint64_t m_recvTimeout;
-    uint64_t m_sendTimeout;
-};
-
-class FdManager {
-public:
+    typedef std::shared_ptr<IOManager> ptr;
     typedef RWMutex RWMutexType;
-    FdManager();
 
-    FdCtx::ptr get(int fd, bool auto_create = false);
-    void del(int fd);
-
+    enum Event {
+        NONE    = 0x0,
+        READ    = 0x1, //EPOLLIN
+        WRITE   = 0x4, //EPOLLOUT
+    };
 private:
-    RWMutexType m_mutex;
-    std::vector<FdCtx::ptr> m_datas;
-};
+    struct FdContext {
+        typedef Mutex MutexType;
+        struct EventContext {
+            Scheduler* scheduler = nullptr; //事件执行的scheduler
+            Fiber::ptr fiber;               //事件协程
+            std::function<void()> cb;       //事件的回调函数
+        };
 
-typedef Singleton<FdManager> FdMgr;
+        EventContext& getContext(Event event);
+        void resetContext(EventContext& ctx);
+        void triggerEvent(Event event);
+
+        EventContext read;      //读事件
+        EventContext write;     //写事件
+        int fd = 0;             //事件关联的句柄
+        Event events = NONE;    //已经注册的事件
+        MutexType mutex;
+    };
+
+public:
+    IOManager(size_t threads = 1, bool use_caller = true, const std::string& name = "");
+    ~IOManager();
+
+    //0 success, -1 error
+    int addEvent(int fd, Event event, std::function<void()> cb = nullptr);
+    bool delEvent(int fd, Event event);
+    bool cancelEvent(int fd, Event event);
+
+    bool cancelAll(int fd);
+
+    static IOManager* GetThis();
+
+protected:
+    void tickle() override;
+    bool stopping() override;
+    void idle() override;
+    void onTimerInsertedAtFront() override;
+
+    void contextResize(size_t size);
+    bool stopping(uint64_t& timeout);
+private:
+    int m_epfd = 0;
+    int m_tickleFds[2];
+
+    std::atomic<size_t> m_pendingEventCount = {0};
+    RWMutexType m_mutex;
+    std::vector<FdContext*> m_fdContexts;
+};
 
 }
 
