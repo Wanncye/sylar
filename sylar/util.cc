@@ -1,12 +1,13 @@
 #include "util.h"
 #include <execinfo.h>
+#include <sys/time.h>
 
 #include "log.h"
 #include "fiber.h"
 
 namespace sylar {
 
-sylar::Logger::ptr g_logger = SYLAR_LOG_NAME("system");
+static sylar::Logger::ptr g_logger = SYLAR_LOG_NAME("system");
 
 pid_t GetThreadId() {
     return syscall(SYS_gettid);
@@ -42,6 +43,18 @@ std::string BacktraceToString(int size, int skip, const std::string& prefix) {
         ss << prefix << bt[i] << std::endl;
     }
     return ss.str();
+}
+
+uint64_t GetCurrentMS() {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return tv.tv_sec * 1000ul  + tv.tv_usec / 1000;
+}
+
+uint64_t GetCurrentUS() {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return tv.tv_sec * 1000 * 1000ul  + tv.tv_usec;
 }
 
 }
