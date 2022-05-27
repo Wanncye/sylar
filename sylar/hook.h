@@ -1,3 +1,12 @@
+/**
+ * @file hook.h
+ * @brief hook函数封装
+ * @author sylar.yin
+ * @email 564628276@qq.com
+ * @date 2019-06-02
+ * @copyright Copyright (c) 2019年 sylar.yin All rights reserved (www.sylar.top)
+ */
+
 #ifndef __SYLAR_HOOK_H__
 #define __SYLAR_HOOK_H__
 
@@ -5,11 +14,18 @@
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <stdint.h>
 #include <time.h>
 #include <unistd.h>
 
 namespace sylar {
+    /**
+     * @brief 当前线程是否hook
+     */
     bool is_hook_enable();
+    /**
+     * @brief 设置当前线程的hook状态
+     */
     void set_hook_enable(bool flag);
 }
 
@@ -82,6 +98,8 @@ extern getsockopt_fun getsockopt_f;
 
 typedef int (*setsockopt_fun)(int sockfd, int level, int optname, const void *optval, socklen_t optlen);
 extern setsockopt_fun setsockopt_f;
+
+extern int connect_with_timeout(int fd, const struct sockaddr* addr, socklen_t addrlen, uint64_t timeout_ms);
 
 }
 
