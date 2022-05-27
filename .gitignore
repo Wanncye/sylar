@@ -3,3 +3,6 @@ lib
 bin
 *.txt
 .vscode
+html
+latex
+.Ds_Store
