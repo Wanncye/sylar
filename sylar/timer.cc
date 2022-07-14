@@ -135,7 +135,7 @@ uint64_t TimerManager::getNextTimer() {
 
 void TimerManager::listExpiredCb(std::vector<std::function<void()> >& cbs) {
     uint64_t now_ms = sylar::GetCurrentMS();
-    std::vector<Timer::ptr> expired;
+    std::vector<Timer::ptr> expired; // 存放已经超时的定时器
     {
         RWMutexType::ReadLock lock(m_mutex);
         if(m_timers.empty()) {

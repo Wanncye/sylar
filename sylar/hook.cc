@@ -387,30 +387,40 @@ int fcntl(int fd, int cmd, ... /* arg */ ) {
         case F_DUPFD_CLOEXEC:
         case F_SETFD:
         case F_SETOWN:
+#ifdef F_SETSIG
         case F_SETSIG:
+#endif
+#ifdef F_SETLEASE
         case F_SETLEASE:
+#endif
+#ifdef F_NOTIFY
         case F_NOTIFY:
+#endif
 #ifdef F_SETPIPE_SZ
         case F_SETPIPE_SZ:
-#endif
             {
                 int arg = va_arg(va, int);
                 va_end(va);
                 return fcntl_f(fd, cmd, arg); 
             }
             break;
+#endif
         case F_GETFD:
         case F_GETOWN:
+#ifdef F_GETSIG
         case F_GETSIG:
+#endif
+#ifdef F_GETLEASE
         case F_GETLEASE:
+#endif
 #ifdef F_GETPIPE_SZ
         case F_GETPIPE_SZ:
-#endif
             {
                 va_end(va);
                 return fcntl_f(fd, cmd);
             }
             break;
+#endif
         case F_SETLK:
         case F_SETLKW:
         case F_GETLK:
@@ -420,7 +430,10 @@ int fcntl(int fd, int cmd, ... /* arg */ ) {
                 return fcntl_f(fd, cmd, arg);
             }
             break;
+#ifdef F_GETOWN_EX
         case F_GETOWN_EX:
+#endif
+#ifdef F_SETOWN_EX
         case F_SETOWN_EX:
             {
                 struct f_owner_exlock* arg = va_arg(va, struct f_owner_exlock*);
@@ -428,6 +441,7 @@ int fcntl(int fd, int cmd, ... /* arg */ ) {
                 return fcntl_f(fd, cmd, arg);
             }
             break;
+#endif
         default:
             va_end(va);
             return fcntl_f(fd, cmd);

@@ -12,8 +12,8 @@ static Logger::ptr g_logger = SYLAR_LOG_NAME("system");
 static std::atomic<uint64_t> s_fiber_id {0};
 static std::atomic<uint64_t> s_fiber_count {0};
 
-static thread_local Fiber* t_fiber = nullptr;
-static thread_local Fiber::ptr t_threadFiber = nullptr;
+static thread_local Fiber* t_fiber = nullptr; //正在运行的协程
+static thread_local Fiber::ptr t_threadFiber = nullptr; //当前线程主协程
 
 static ConfigVar<uint32_t>::ptr g_fiber_stack_size =
     Config::Lookup<uint32_t>("fiber.stack_size", 1024 * 1024, "fiber stack size");
@@ -207,7 +207,7 @@ void Fiber::MainFunc() {
     }
 
     auto raw_ptr = cur.get();
-    cur.reset();
+    cur.reset();    // 智能指针reset，引用计数-1
     raw_ptr->swapOut();
 
     SYLAR_ASSERT2(false, "never reach fiber_id=" + std::to_string(raw_ptr->getId()));
